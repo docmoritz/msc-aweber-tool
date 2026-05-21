@@ -1,0 +1,37 @@
+{% extends "_base.html" %}
+{% block title %}Kohorte — AWeber Tool{% endblock %}
+{% block content %}
+<h2>Kohorte / Gruppe</h2>
+<form method="get" action="/kohorte">
+  <label>grp-Tag
+    <input type="text" name="grp" value="{{ grp }}" required placeholder="grp-kohorte-2026-05" list="grp-list">
+  </label>
+  <datalist id="grp-list">
+    {% for a in aktionen %}<option value="{{ a.action }}">{% endfor %}
+  </datalist>
+  <button type="submit">Anzeigen</button>
+</form>
+
+{% if members is not none %}
+  {% if members %}
+  <div class="card">
+    <h3>{{ grp }} — {{ members | length }} Mitglieder</h3>
+    <table>
+      <thead><tr><th>Email</th><th>Lifecycle</th><th>Engagement</th><th>vb-*</th><th>Stale</th><th>engagement_set_at</th></tr></thead>
+      {% for m in members %}
+      <tr>
+        <td><a href="/journey?email={{ m.email }}">{{ m.email }}</a></td>
+        <td>{{ m.lifecycle or "-" }}</td>
+        <td>{{ m.engagement or "-" }}</td>
+        <td>{{ m.verbundenheit | join(",") or "-" }}</td>
+        <td>{{ "ja" if m.stale else "nein" }}</td>
+        <td>{{ m.engagement_set_at or "-" }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">(keine Mitglieder in <code>{{ grp }}</code>)</p>
+  {% endif %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "_base.html" %}
+{% block title %}Aktion — AWeber Tool{% endblock %}
+{% block content %}
+<h2>Aktion Status (Phase × Stufe)</h2>
+<form method="get" action="/aktion">
+  <label>grp-Tag
+    <input type="text" name="grp" value="{{ grp }}" required placeholder="grp-launch-2026-q2" list="grp-list">
+  </label>
+  <datalist id="grp-list">
+    {% for a in aktionen %}<option value="{{ a.action }}">{% endfor %}
+  </datalist>
+  <button type="submit">Anzeigen</button>
+</form>
+
+{% if data %}
+<div class="card">
+  <h3>{{ data.action }} — {{ data.total }} Mitglieder</h3>
+  <table>
+    <thead><tr><th>Phase</th><th>noeng</th><th>open</th><th>intent</th><th>hot</th><th>conv</th></tr></thead>
+    {% for phase, stages in data.by_phase.items() %}
+    <tr>
+      <td><strong>{{ phase }}</strong></td>
+      {% if stages %}
+        <td class="num">{{ stages["act-noeng"] }}</td>
+        <td class="num">{{ stages["act-open"] }}</td>
+        <td class="num">{{ stages["act-intent"] }}</td>
+        <td class="num">{{ stages["act-hot"] }}</td>
+        <td class="num">{{ stages["act-conv"] }}</td>
+      {% else %}
+        <td colspan="5" class="muted">(leer)</td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}MSC AWeber Tool{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>📊 AWeber Tool</h1>
+      <nav>
+        <a href="/">Übersicht</a>
+        <a href="/journey">Journey</a>
+        <a href="/kohorte">Kohorte</a>
+        <a href="/status">Status</a>
+        <a href="/aktion">Aktion</a>
+        <a href="/tag">Tag</a>
+        <a href="/aktion-lifecycle">Lifecycle</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="container">
+    <p>Tagging-Doktrin v2 — <a href="https://github.com/docmoritz/msc-verfassung/blob/master/marketing-doktrin/02-tagging-doktrin.md" target="_blank">02-tagging-doktrin.md</a></p>
+  </footer>
+</body>
+</html>

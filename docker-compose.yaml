@@ -1,0 +1,11 @@
+services:
+  msc-aweber-tool:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - AWEBER_GATE_URL=${AWEBER_GATE_URL:-https://aweber.docmoritz.academy}
+      - AWEBER_GATE_API_KEY=${AWEBER_GATE_API_KEY}
+      - BASIC_AUTH_USER=${BASIC_AUTH_USER:-ar}
+      - BASIC_AUTH_PASS=${BASIC_AUTH_PASS}
+    restart: unless-stopped

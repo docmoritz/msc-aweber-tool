@@ -1,0 +1,82 @@
+{% extends "_base.html" %}
+{% block title %}Aktions-Lifecycle — AWeber Tool{% endblock %}
+{% block content %}
+<h2>Aktions-Lifecycle</h2>
+
+<details open>
+<summary><strong>1. Prepare</strong> — neue Aktion starten</summary>
+<form method="post" action="/aktion-lifecycle/prepare">
+  <label>grp-Tag (neue Aktion)
+    <input type="text" name="grp" required placeholder="grp-launch-2026-q2">
+  </label>
+  <label>Include-Filter <small>(Komma-getrennt)</small>
+    <input type="text" name="include" placeholder="lc-lead">
+  </label>
+  <label>Exclude-Filter
+    <input type="text" name="exclude" placeholder="eng-noeng">
+  </label>
+  <label><input type="checkbox" name="dry_run" checked> Dry-Run</label>
+  <button type="submit">Prepare</button>
+</form>
+</details>
+
+<details>
+<summary><strong>2. Phase-Transition</strong> — Phasenwechsel</summary>
+<form method="post" action="/aktion-lifecycle/transition">
+  <label>grp-Tag
+    <input type="text" name="grp" required list="grp-list">
+  </label>
+  <datalist id="grp-list">
+    {% for a in aktionen %}<option value="{{ a.action }}">{% endfor %}
+  </datalist>
+  <label>From-Phase
+    <select name="from_phase">
+      {% for p in phases %}<option value="phase-{{ p }}">phase-{{ p }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>To-Phase
+    <select name="to_phase">
+      {% for p in phases %}<option value="phase-{{ p }}">phase-{{ p }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Min-Stufe
+    <select name="min_stufe">
+      {% for s in stages %}<option value="act-{{ s }}" {% if s == "open" %}selected{% endif %}>act-{{ s }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Dropout-Verhalten
+    <select name="dropout">
+      <option value="keep_phase">keep_phase</option>
+      <option value="remove_action">remove_action</option>
+    </select>
+  </label>
+  <label><input type="checkbox" name="dry_run" checked> Dry-Run</label>
+  <button type="submit">Transition</button>
+</form>
+</details>
+
+<details>
+<summary><strong>3. Cleanup</strong> — Aktion abschließen</summary>
+<form method="post" action="/aktion-lifecycle/cleanup">
+  <label>grp-Tag
+    <input type="text" name="grp" required list="grp-list2">
+  </label>
+  <datalist id="grp-list2">
+    {% for a in aktionen %}<option value="{{ a.action }}">{% endfor %}
+  </datalist>
+  <label><input type="checkbox" name="dry_run" checked> Dry-Run</label>
+  <button type="submit">Cleanup</button>
+</form>
+</details>
+
+{% if error %}
+<div class="card error"><p>{{ error }}</p></div>
+{% endif %}
+
+{% if result %}
+<div class="card success">
+  <h3>Ergebnis ({{ action or "-" }})</h3>
+  <pre>{{ result | tojson(indent=2) }}</pre>
+</div>
+{% endif %}
+{% endblock %}

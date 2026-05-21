@@ -1,0 +1,36 @@
+{% extends "_base.html" %}
+{% block title %}Tag — AWeber Tool{% endblock %}
+{% block content %}
+<h2>Tags setzen / entfernen</h2>
+<form method="post" action="/tag">
+  <label>Email
+    <input type="email" name="email" value="{{ email_val or '' }}" required>
+  </label>
+  <label>Tags zum Hinzufügen <small>(Komma-getrennt, mit Präfix z.B. grp-newsletter)</small>
+    <input type="text" name="add_tags" value="{{ add_val or '' }}" placeholder="grp-newsletter, vb-vip">
+  </label>
+  <label>Tags zum Entfernen <small>(Komma-getrennt)</small>
+    <input type="text" name="remove_tags" value="{{ remove_val or '' }}" placeholder="eng-noeng">
+  </label>
+  <button type="submit">Anwenden</button>
+</form>
+
+{% if error %}
+<div class="card error"><p>{{ error }}</p></div>
+{% endif %}
+
+{% if result %}
+<div class="card success">
+  <h3>Ergebnis</h3>
+  <table>
+    <tr><td>Email</td><td>{{ result.email }}</td></tr>
+    <tr><td>Hinzugefügt</td><td>{{ result.added | join(", ") or "-" }}</td></tr>
+    <tr><td>Entfernt</td><td>{{ result.removed | join(", ") or "-" }}</td></tr>
+    <tr><td>Übersprungen</td><td>{{ result.skipped | join(", ") or "-" }}</td></tr>
+    {% if result.rejected %}
+    <tr><td>Abgelehnt</td><td>{{ result.rejected | join(", ") }}</td></tr>
+    {% endif %}
+  </table>
+</div>
+{% endif %}
+{% endblock %}

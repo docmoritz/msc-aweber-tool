@@ -1,0 +1,64 @@
+{% extends "_base.html" %}
+{% block title %}Übersicht — MSC AWeber Tool{% endblock %}
+{% block content %}
+<h2>Übersicht</h2>
+
+<div class="grid">
+  <section class="card">
+    <h3>Lifecycle</h3>
+    <table>
+      {% for k, v in lifecycle.items() if k != "total" %}
+      <tr><td>{{ k }}</td><td class="num">{{ v }}</td></tr>
+      {% endfor %}
+      <tr class="total"><td>Total</td><td class="num">{{ lifecycle.total }}</td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h3>Engagement (Funnel)</h3>
+    <table>
+      {% set total = engagement.total or 1 %}
+      {% for k in ["eng-noeng", "eng-open", "eng-intent", "eng-hot", "eng-conv", "eng-stale"] %}
+      {% set v = engagement[k] %}
+      <tr>
+        <td>{{ k }}</td>
+        <td class="num">{{ v }}</td>
+        <td class="bar"><span style="width: {{ (v * 100 / total) | round }}%"></span></td>
+      </tr>
+      {% endfor %}
+      <tr class="total"><td>Total</td><td class="num">{{ engagement.total }}</td><td></td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+    <h3>Verbundenheit</h3>
+    {% if verbundenheit %}
+    <table>
+      {% for k, v in verbundenheit.items() %}
+      <tr><td>{{ k }}</td><td class="num">{{ v }}</td></tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p class="muted">(keine vb-* Tags)</p>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h3>Aktive Aktionen</h3>
+    {% if aktionen %}
+    <table>
+      <thead><tr><th>Aktion</th><th>Mitglieder</th><th>Laufend</th></tr></thead>
+      {% for a in aktionen %}
+      <tr>
+        <td><a href="/aktion?grp={{ a.action }}">{{ a.action }}</a></td>
+        <td class="num">{{ a.members }}</td>
+        <td class="num">{{ a.with_phase }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p class="muted">(keine Aktionen)</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

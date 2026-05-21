@@ -1,0 +1,41 @@
+{% extends "_base.html" %}
+{% block title %}Journey — AWeber Tool{% endblock %}
+{% block content %}
+<h2>Customer Journey</h2>
+<form method="get" action="/journey">
+  <label>Email
+    <input type="email" name="email" value="{{ email }}" required placeholder="user@example.de">
+  </label>
+  <button type="submit">Anzeigen</button>
+</form>
+
+{% if data %}
+  {% if data._hinweis %}
+    <div class="card error"><p>Subscriber nicht gefunden: <code>{{ data.email or email }}</code></p></div>
+  {% else %}
+  <div class="card">
+    <h3>{{ data.email }}</h3>
+    <table>
+      <tr><td>Lifecycle</td><td>{{ data.lifecycle or "-" }}</td></tr>
+      <tr><td>Engagement</td><td>{{ data.engagement or "-" }}</td></tr>
+      <tr><td>Stale</td><td>{{ "ja" if data.stale else "nein" }}</td></tr>
+      <tr><td>Verbundenheit</td><td>{{ data.verbundenheit | join(", ") or "-" }}</td></tr>
+      <tr><td>Gruppen</td><td>{{ data.gruppen | join(", ") or "-" }}</td></tr>
+      {% if data.aktuelle_aktion %}
+      <tr><td>Aktuelle Aktion</td><td>{{ data.aktuelle_aktion.grp }} ({{ data.aktuelle_aktion.phase }} / {{ data.aktuelle_aktion.stufe }})</td></tr>
+      {% else %}
+      <tr><td>Aktuelle Aktion</td><td>-</td></tr>
+      {% endif %}
+    </table>
+    <h4>Custom Fields</h4>
+    <table>
+      {% for k, v in data.custom_fields.items() %}
+      <tr><td>{{ k }}</td><td>{{ v or "-" }}</td></tr>
+      {% endfor %}
+    </table>
+    <h4>Alle Tags</h4>
+    <p>{% for t in data.alle_tags %}<code>{{ t }}</code> {% endfor %}</p>
+  </div>
+  {% endif %}
+{% endif %}
+{% endblock %}
