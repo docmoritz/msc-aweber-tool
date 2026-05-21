@@ -1,4 +1,13 @@
 """Client fuer aweber-gate (https://aweber.docmoritz.academy)."""
+# Windows-Workaround: truststore VOR httpx importieren damit System-CA-Bundle
+# benutzt wird (sonst SSL_CERTIFICATE_VERIFY_FAILED bei lokalem Test).
+# In Linux-Containern (Coolify) ueberfluessig aber harmlos.
+try:
+    import truststore
+    truststore.inject_into_ssl()
+except ImportError:
+    pass
+
 import os
 from collections import Counter
 from typing import Any
