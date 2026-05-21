@@ -25,7 +25,11 @@
     {% block content %}{% endblock %}
   </main>
   <footer class="container">
-    <p>Tagging-Doktrin v2 — <a href="https://github.com/docmoritz/msc-verfassung/blob/master/marketing-doktrin/02-tagging-doktrin.md" target="_blank">02-tagging-doktrin.md</a></p>
+    <p>
+      <span class="datenstand">Datenstand: {{ datenstand() }}</span>
+      &nbsp;·&nbsp;
+      Tagging-Doktrin v2 — <a href="https://github.com/docmoritz/msc-verfassung/blob/master/marketing-doktrin/02-tagging-doktrin.md" target="_blank">02-tagging-doktrin.md</a>
+    </p>
   </footer>
 </body>
 </html>

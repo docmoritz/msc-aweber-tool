@@ -7,6 +7,7 @@ Doktrin: msc-verfassung/marketing-doktrin/02-tagging-doktrin.md
 """
 import os
 import secrets
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Form, HTTPException, Request, status
@@ -17,10 +18,18 @@ from fastapi.templating import Jinja2Templates
 
 from . import gate
 
+MEZ = timezone(timedelta(hours=2), name="MEZ")  # CEST waehrend Sommerzeit
+
+
+def datenstand() -> str:
+    """Aktueller Zeitstempel der Abfrage in MEZ."""
+    return datetime.now(MEZ).strftime("%Y-%m-%d %H:%M MEZ")
+
 app = FastAPI(title="MSC AWeber Tool", version="1.0.0")
 
 BASE_DIR = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+templates.env.globals["datenstand"] = datenstand  # global verfuegbar in allen Templates
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
 security = HTTPBasic()
