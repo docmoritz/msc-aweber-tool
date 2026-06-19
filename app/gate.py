@@ -16,7 +16,16 @@ import httpx
 
 GATE_URL = os.environ.get("AWEBER_GATE_URL", "https://aweber.docmoritz.academy")
 GATE_TOKEN = os.environ.get("AWEBER_GATE_API_KEY", "")
+# Welt-Listen-Identity: MSC-Tool bedient die Microskills-Liste explizit (Gate-Default
+# wird abgeschafft). Env-ueberschreibbar.
+LIST_ID = os.environ.get("AWEBER_LIST_ID", "6953991")
 TIMEOUT = 20
+
+
+def _u(path: str) -> str:
+    """Gate-URL inkl. expliziter list_id (welt-eigene Listen-Identity)."""
+    sep = "&" if "?" in path else "?"
+    return f"{GATE_URL}{path}{sep}list_id={LIST_ID}"
 
 FUNNEL_STAGES = ("noeng", "open", "intent", "hot", "conv")
 PHASES = ("preprel", "prel", "cart", "post")
@@ -34,7 +43,7 @@ def _client() -> httpx.Client:
 
 def get_subscribers() -> list[dict]:
     with _client() as c:
-        r = c.get(f"{GATE_URL}/subscribers")
+        r = c.get(_u("/subscribers"))
         r.raise_for_status()
         d = r.json()
         return d.get("subscribers") or d.get("entries") or []
@@ -49,7 +58,7 @@ def get_action_state(grp_tag: str) -> dict:
 
 def get_broadcast_stats(broadcast_id: int) -> dict:
     with _client() as c:
-        r = c.get(f"{GATE_URL}/broadcasts/{broadcast_id}/stats")
+        r = c.get(_u(f"/broadcasts/{broadcast_id}/stats"))
         if r.status_code == 404:
             return {"_hinweis": "broadcast_not_found"}
         r.raise_for_status()
@@ -59,7 +68,7 @@ def get_broadcast_stats(broadcast_id: int) -> dict:
 def bulk_tags(email: str, add: list[str], remove: list[str]) -> dict:
     with _client() as c:
         r = c.post(
-            f"{GATE_URL}/subscribers/{email}/tags/bulk",
+            _u(f"/subscribers/{email}/tags/bulk"),
             json={"add": add, "remove": remove},
         )
         r.raise_for_status()
@@ -68,7 +77,7 @@ def bulk_tags(email: str, add: list[str], remove: list[str]) -> dict:
 
 def set_custom_fields(email: str, fields: dict) -> dict:
     with _client() as c:
-        r = c.post(f"{GATE_URL}/subscribers/{email}/custom-fields", json=fields)
+        r = c.post(_u(f"/subscribers/{email}/custom-fields"), json=fields)
         r.raise_for_status()
         return r.json()
 
