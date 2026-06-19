@@ -57,12 +57,87 @@ def get_action_state(grp_tag: str) -> dict:
 
 
 def get_broadcast_stats(broadcast_id: int) -> dict:
+    """Broadcast-Stats vom Gate abrufen und auf kanonische Felder normalisieren.
+
+    Das Gate liefert: total_sent / total_unique_opens / total_clicks.
+    Aeltere Gate-Versionen nutzen: num_sent / unique_opens / unique_clicks.
+    Beide werden unterstuetzt; die neuen Felder haben Vorrang.
+
+    Rueckgabe-Felder:
+        sends       -- Anzahl gesendeter Mails
+        opens       -- Eindeutige Oeffnungen
+        clicks      -- Eindeutige Klicks
+        open_rate   -- Oeffnungsrate (0.0-1.0)
+        click_rate  -- Klickrate (0.0-1.0)
+        subject     -- Betreff der Broadcast-Mail (falls vom Gate geliefert)
+        sent_at     -- ISO-8601-Zeitstempel des Versandzeitpunkts (falls vorhanden)
+        broadcast_id -- Echo der abgefragten ID
+    """
     with _client() as c:
         r = c.get(_u(f"/broadcasts/{broadcast_id}/stats"))
         if r.status_code == 404:
-            return {"_hinweis": "broadcast_not_found"}
+            return {"_hinweis": "broadcast_not_found", "broadcast_id": broadcast_id}
         r.raise_for_status()
-        return r.json()
+        raw = r.json()
+
+    # Feld-Normalisierung: neue Namen bevorzugen, alte als Fallback
+    sends = raw.get("total_sent") if raw.get("total_sent") is not None else raw.get("num_sent")
+    opens = raw.get("total_unique_opens") if raw.get("total_unique_opens") is not None else raw.get("unique_opens")
+    clicks = raw.get("total_clicks") if raw.get("total_clicks") is not None else raw.get("unique_clicks")
+
+    return {
+        "broadcast_id": broadcast_id,
+        "sends": sends,
+        "opens": opens,
+        "clicks": clicks,
+        "open_rate": raw.get("open_rate"),
+        "click_rate": raw.get("click_rate"),
+        "subject": raw.get("subject"),
+        "sent_at": raw.get("sent_at"),
+    }
+
+
+def list_broadcasts(status_filter: str = "sent", limit: int = 10, list_id: str | None = None) -> list[dict]:
+    """Broadcasts vom Gate abrufen (neueste zuerst).
+
+    Args:
+        status_filter: Gate-Query-Param (NICHT 'status' — FastAPI ignoriert unbekannte
+                       Params still). Erlaubte Werte: 'sent', 'scheduled', 'draft'.
+        limit:         Maximale Anzahl zurueckgegebener Broadcasts.
+        list_id:       AWeber-Listen-ID; wird aus Env uebernommen, wenn None.
+
+    Rueckgabe: Liste von Dicts mit id, subject, sent_at, status.
+    """
+    lid = list_id or LIST_ID
+    params = f"status_filter={status_filter}&limit={limit}&list_id={lid}"
+    url = f"{GATE_URL}/broadcasts?{params}"
+    with _client() as c:
+        r = c.get(url)
+        r.raise_for_status()
+        data = r.json()
+    # Gate kann Liste direkt oder unter 'broadcasts'-Schluessel liefern
+    entries = data if isinstance(data, list) else data.get("broadcasts") or data.get("entries") or []
+    return [
+        {
+            "id": e.get("id"),
+            "subject": e.get("subject"),
+            "sent_at": e.get("sent_at"),
+            "status": e.get("status"),
+        }
+        for e in entries
+    ]
+
+
+def get_latest_broadcast(list_id: str | None = None) -> dict | None:
+    """Convenience: letzten gesendeten Broadcast mit Stats zurueckgeben oder None."""
+    broadcasts = list_broadcasts(status_filter="sent", limit=1, list_id=list_id)
+    if not broadcasts:
+        return None
+    bid = broadcasts[0].get("id")
+    if not bid:
+        return None
+    stats = get_broadcast_stats(bid)
+    return {**broadcasts[0], **stats}
 
 
 def bulk_tags(email: str, add: list[str], remove: list[str]) -> dict:
