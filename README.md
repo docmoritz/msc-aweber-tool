@@ -1,3 +1,15 @@
+---
+name: MSC AWeber Tool
+typ: dienst
+zweck: Mobile-taugliche Web-UI fuer AWeber-Operationen gemaess Tagging-Doktrin v2 (Tag-Setzen, Journey, Kohorten, Aktion-Lifecycle)
+trigger: permanent
+output: HTML-Seiten mit AWeber-Daten; Schreib-Operationen via aweber-gate
+abhaengigkeiten: aweber-gate (https://aweber.docmoritz.academy), AWeber Public API
+endpunkt: https://aweber-tool.docmoritz.academy
+repo: docmoritz/msc-aweber-tool
+wiki: true
+---
+
 # msc-aweber-tool
 
 Mobile-fähige Web-UI für AWeber-Operationen gemäß Tagging-Doktrin v2.
