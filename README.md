@@ -65,6 +65,8 @@ uvicorn app.main:app --reload
    - `AWEBER_GATE_API_KEY` = (aus `/etc/msc/aweber-gate.env`)
    - `BASIC_AUTH_PASS` = `<sicheres-passwort>` (notieren!)
    - `BASIC_AUTH_USER` = `ar` (optional, default)
+   - `AWEBER_GATE_URL` = `https://aweber.docmoritz.academy` (optional, default)
+   - `AWEBER_LIST_ID` = `6953991` (optional, default, MSC-Hauptliste)
 6. Deploy → Coolify baut Container, holt Let's-Encrypt-Cert, route auf Subdomain
 7. Auto-Deploy bei jedem `git push origin main` aktivieren
 
