@@ -39,6 +39,33 @@ Browser → FastAPI (BasicAuth) → aweber-gate (Bearer) → AWeber Public API
 
 Gleiche Logik wie das CLI `/opt/msc/scripts/marketing/aweber_cli.py` und der Claude-Skill `/aweber`. Drei Wege auf dieselbe Funktionalität.
 
+## Technisches
+
+**Entry-Point:** `app/main.py` (`uvicorn app.main:app`)
+**Starten:** `uvicorn app.main:app --reload`
+
+**Env-Vars:**
+| Variable | Pflicht | Default | Beschreibung |
+|---|---|---|---|
+| `AWEBER_GATE_API_KEY` | ja | – | Bearer-Token für aweber-gate |
+| `BASIC_AUTH_PASS` | ja | – | Passwort für BasicAuth |
+| `AWEBER_GATE_URL` | nein | `https://aweber.docmoritz.academy` | Gate-Basis-URL |
+| `BASIC_AUTH_USER` | nein | `ar` | Benutzername für BasicAuth |
+| `AWEBER_LIST_ID` | nein | `6953991` | AWeber-Listen-ID (MSC-Hauptliste) |
+
+**Ordnerstruktur:**
+```
+msc-aweber-tool/
+├── app/
+│   ├── main.py          # FastAPI-Routen, BasicAuth, Template-Rendering
+│   ├── gate.py          # HTTP-Client gegen aweber-gate
+│   ├── templates/       # Jinja2-HTML-Templates
+│   └── static/          # CSS-Stylesheet
+├── Dockerfile
+├── docker-compose.yaml
+└── requirements.txt
+```
+
 ## Local Development
 
 ```bash
