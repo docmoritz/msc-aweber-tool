@@ -1,0 +1,9 @@
+# Zeilenenden weltneutral: im Repo IMMER LF, unabhaengig von core.autocrlf der
+# jeweiligen Maschine. Ohne diese Zeile liefert ein Byte-Hash (sha256 ueber die
+# Datei) auf Windows einen anderen Wert als auf dem Server -- und erzeugt
+# Warnungen ueber Aenderungen, die es nie gab.  -- CIO 28.08.2026
+* text=auto eol=lf
+
+# Ausnahme: Windows-Startdateien brauchen CRLF, sonst startet cmd.exe sie nicht.
+*.bat text eol=crlf
+*.cmd text eol=crlf
